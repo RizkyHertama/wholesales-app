@@ -1,6 +1,12 @@
 package common
 
-import "log"
+import (
+    "log"
+    "os"
+)
 
-func Info(v ...interface{}) { log.Println(v...) }
-func Error(v ...interface{}) { log.Println(v...) }
+var Logger *log.Logger
+
+func InitLogger() {
+    Logger = log.New(os.Stdout, "[WHOLESALES] ", log.LstdFlags|log.Lshortfile)
+}

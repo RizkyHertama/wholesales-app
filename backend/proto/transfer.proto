@@ -1,0 +1,44 @@
+syntax = "proto3";
+package wholesales.transfer;
+option go_package = "github.com/RizkyHertama/wholesales-app/backend/internal/transfer;transferpb";
+
+import "common.proto";
+
+message CreateTransferRequest {
+  string trace_id = 1;
+  int64 from_company_id = 2;
+  string to_bank_code = 3;
+  string to_account_number = 4;
+  double amount = 5;
+  wholesales.common.TransferMethod method = 6;
+}
+
+message CreateTransferResponse {
+  string trace_id = 1;
+  wholesales.common.TransferStatus status = 2;
+  string message = 3;
+}
+
+message GetTransferRequest {
+  string trace_id = 1;
+}
+
+message TransferRecord {
+  int64 id = 1;
+  string trace_id = 2;
+  int64 from_company_id = 3;
+  int64 to_company_id = 4;
+  string to_bank_code = 5;
+  string to_account_number = 6;
+  double amount = 7;
+  wholesales.common.TransferMethod method = 8;
+  wholesales.common.TransferStatus status = 9;
+  double fee = 10;
+  string created_at = 11;
+  string processed_at = 12;
+}
+
+service TransferService {
+  rpc CreateTransfer(CreateTransferRequest) returns (CreateTransferResponse);
+  rpc GetTransfer(GetTransferRequest) returns (TransferRecord);
+}

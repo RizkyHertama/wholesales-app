@@ -1,0 +1,18 @@
+syntax = "proto3";
+package wholesales.topup;
+option go_package = "github.com/RizkyHertama/wholesales-app/backend/internal/topup;topuppb";
+
+message TopupRequest {
+  int64 company_id = 1;
+  double amount = 2;
+  string method = 3;
+}
+
+message TopupResponse {
+  bool ok = 1;
+  string message = 2;
+}
+
+service TopupService {
+  rpc Topup(TopupRequest) returns (TopupResponse);
+}

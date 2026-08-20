@@ -1,0 +1,47 @@
+syntax = "proto3";
+package wholesales.company;
+option go_package = "github.com/RizkyHertama/wholesales-app/backend/internal/company;companypb";
+
+import "common.proto";
+
+message Company {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+  string bank_code = 4;
+  string account_number = 5;
+  double balance = 6;
+  string created_at = 7;
+}
+
+message RegisterRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  string bank_code = 4;
+  string account_number = 5;
+}
+
+message RegisterResponse {
+  Company company = 1;
+  string token = 2;
+}
+
+message GetCompanyRequest {
+  int64 id = 1;
+}
+
+message ListCompaniesRequest {
+  common.Pagination paging = 1;
+}
+
+message ListCompaniesResponse {
+  repeated Company companies = 1;
+  int32 total = 2;
+}
+
+service CompanyService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc GetCompany(GetCompanyRequest) returns (Company);
+  rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse);
+}

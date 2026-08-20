@@ -1,20 +1,30 @@
 package common
 
 import (
-	"database/sql"
-	"fmt"
+    "context"
+    "fmt"
+    "log"
 
-	_ "github.com/go-sql-driver/mysql"
+    "github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewDB(user, pass, host, dbname string) (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", user, pass, host, dbname)
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, err
-	}
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-	return db, nil
+var DB *pgxpool.Pool
+
+// InitDB membuat koneksi pool ke Postgres
+func InitDB() {
+    dsn := "postgres://app:pass@localhost:5432/wholesales_db?sslmode=disable"
+
+    var err error
+    DB, err = pgxpool.New(context.Background(), dsn)
+    if err != nil {
+        log.Fatalf("Gagal koneksi ke database: %v", err)
+    }
+
+    // Tes koneksi
+    err = DB.Ping(context.Background())
+    if err != nil {
+        log.Fatalf("Database tidak bisa diakses: %v", err)
+    }
+
+    fmt.Println("✅ Koneksi ke Postgres berhasil")
 }
