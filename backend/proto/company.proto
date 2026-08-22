@@ -1,47 +1,55 @@
 syntax = "proto3";
-package wholesales.company;
-option go_package = "github.com/RizkyHertama/wholesales-app/backend/internal/company;companypb";
 
-import "common.proto";
+package company;
+option go_package = "wholesales-app/backend/server/pb";
 
 message Company {
-  int64 id = 1;
-  string name = 2;
-  string email = 3;
-  string bank_code = 4;
-  string account_number = 5;
-  double balance = 6;
-  string created_at = 7;
+  int64  id             = 1;
+  string name           = 2;
+  string email          = 3;
+  string phone          = 4;
+  double balance        = 5;
+  string account_number = 6;
+  string created_at     = 7;
 }
 
-message RegisterRequest {
-  string name = 1;
-  string email = 2;
-  string password = 3;
-  string bank_code = 4;
-  string account_number = 5;
+message GetCompanyListRequest {
+  int32 page  = 1;
+  int32 limit = 2;
 }
 
-message RegisterResponse {
-  Company company = 1;
-  string token = 2;
-}
-
-message GetCompanyRequest {
-  int64 id = 1;
-}
-
-message ListCompaniesRequest {
-  common.Pagination paging = 1;
-}
-
-message ListCompaniesResponse {
+message GetCompanyListResponse {
   repeated Company companies = 1;
-  int32 total = 2;
+  int32            total     = 2;
+}
+
+message GetCompanyDetailRequest {
+  int64 company_id = 1;
+}
+
+message TopUpRequest {
+  int64  company_id = 1;
+  double amount     = 2;
+  string note       = 3;
+}
+
+message TopUpResponse {
+  string message     = 1;
+  double new_balance = 2;
+}
+
+message GetBalanceRequest {
+  int64 company_id = 1;
+}
+
+message GetBalanceResponse {
+  double balance        = 1;
+  string account_number = 2;
 }
 
 service CompanyService {
-  rpc Register(RegisterRequest) returns (RegisterResponse);
-  rpc GetCompany(GetCompanyRequest) returns (Company);
-  rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse);
+  rpc GetCompanyList   (GetCompanyListRequest)   returns (GetCompanyListResponse);
+  rpc GetCompanyDetail (GetCompanyDetailRequest) returns (Company);
+  rpc TopUp            (TopUpRequest)            returns (TopUpResponse);
+  rpc GetBalance       (GetBalanceRequest)       returns (GetBalanceResponse);
 }

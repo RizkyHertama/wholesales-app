@@ -1,44 +1,62 @@
 syntax = "proto3";
-package wholesales.transfer;
-option go_package = "github.com/RizkyHertama/wholesales-app/backend/internal/transfer;transferpb";
 
-import "common.proto";
+package transfer;
+option go_package = "wholesales-app/backend/server/pb";
 
-message CreateTransferRequest {
-  string trace_id = 1;
-  int64 from_company_id = 2;
-  string to_bank_code = 3;
+enum TransferType {
+  INTERNAL = 0;
+  EXTERNAL = 1;
+}
+
+enum PaymentMethod {
+  BI_FAST = 0;
+  RTGS    = 1;
+  SKN     = 2;
+}
+
+message Transfer {
+  int64  id                = 1;
+  int64  from_company_id   = 2;
+  int64  to_company_id     = 3;
   string to_account_number = 4;
-  double amount = 5;
-  wholesales.common.TransferMethod method = 6;
+  string to_bank_name      = 5;
+  double amount            = 6;
+  double fee               = 7;
+  string payment_method    = 8;
+  string transfer_type     = 9;
+  string status            = 10;
+  string note              = 11;
+  string created_at        = 12;
 }
 
-message CreateTransferResponse {
-  string trace_id = 1;
-  wholesales.common.TransferStatus status = 2;
-  string message = 3;
+message DoTransferRequest {
+  int64         from_company_id   = 1;
+  string        to_account_number = 2;
+  string        to_bank_name      = 3;
+  double        amount            = 4;
+  TransferType  transfer_type     = 5;
+  PaymentMethod payment_method    = 6;
+  string        note              = 7;
 }
 
-message GetTransferRequest {
-  string trace_id = 1;
+message DoTransferResponse {
+  string message           = 1;
+  bool   success           = 2;
+  double remaining_balance = 3;
 }
 
-message TransferRecord {
-  int64 id = 1;
-  string trace_id = 2;
-  int64 from_company_id = 3;
-  int64 to_company_id = 4;
-  string to_bank_code = 5;
-  string to_account_number = 6;
-  double amount = 7;
-  wholesales.common.TransferMethod method = 8;
-  wholesales.common.TransferStatus status = 9;
-  double fee = 10;
-  string created_at = 11;
-  string processed_at = 12;
+message GetHistoryRequest {
+  int64 company_id = 1;
+  int32 page       = 2;
+  int32 limit      = 3;
+}
+
+message GetHistoryResponse {
+  repeated Transfer transfers = 1;
+  int32             total     = 2;
 }
 
 service TransferService {
-  rpc CreateTransfer(CreateTransferRequest) returns (CreateTransferResponse);
-  rpc GetTransfer(GetTransferRequest) returns (TransferRecord);
+  rpc DoTransfer (DoTransferRequest) returns (DoTransferResponse);
+  rpc GetHistory (GetHistoryRequest) returns (GetHistoryResponse);
 }

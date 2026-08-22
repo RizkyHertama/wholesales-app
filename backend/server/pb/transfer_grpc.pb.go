@@ -4,7 +4,7 @@
 // - protoc             v7.35.1
 // source: transfer.proto
 
-package transferpb
+package pb
 
 import (
 	context "context"
@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TransferService_CreateTransfer_FullMethodName = "/wholesales.transfer.TransferService/CreateTransfer"
-	TransferService_GetTransfer_FullMethodName    = "/wholesales.transfer.TransferService/GetTransfer"
+	TransferService_DoTransfer_FullMethodName = "/transfer.TransferService/DoTransfer"
+	TransferService_GetHistory_FullMethodName = "/transfer.TransferService/GetHistory"
 )
 
 // TransferServiceClient is the client API for TransferService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TransferServiceClient interface {
-	CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error)
-	GetTransfer(ctx context.Context, in *GetTransferRequest, opts ...grpc.CallOption) (*TransferRecord, error)
+	DoTransfer(ctx context.Context, in *DoTransferRequest, opts ...grpc.CallOption) (*DoTransferResponse, error)
+	GetHistory(ctx context.Context, in *GetHistoryRequest, opts ...grpc.CallOption) (*GetHistoryResponse, error)
 }
 
 type transferServiceClient struct {
@@ -39,20 +39,20 @@ func NewTransferServiceClient(cc grpc.ClientConnInterface) TransferServiceClient
 	return &transferServiceClient{cc}
 }
 
-func (c *transferServiceClient) CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error) {
+func (c *transferServiceClient) DoTransfer(ctx context.Context, in *DoTransferRequest, opts ...grpc.CallOption) (*DoTransferResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateTransferResponse)
-	err := c.cc.Invoke(ctx, TransferService_CreateTransfer_FullMethodName, in, out, cOpts...)
+	out := new(DoTransferResponse)
+	err := c.cc.Invoke(ctx, TransferService_DoTransfer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *transferServiceClient) GetTransfer(ctx context.Context, in *GetTransferRequest, opts ...grpc.CallOption) (*TransferRecord, error) {
+func (c *transferServiceClient) GetHistory(ctx context.Context, in *GetHistoryRequest, opts ...grpc.CallOption) (*GetHistoryResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TransferRecord)
-	err := c.cc.Invoke(ctx, TransferService_GetTransfer_FullMethodName, in, out, cOpts...)
+	out := new(GetHistoryResponse)
+	err := c.cc.Invoke(ctx, TransferService_GetHistory_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +63,8 @@ func (c *transferServiceClient) GetTransfer(ctx context.Context, in *GetTransfer
 // All implementations must embed UnimplementedTransferServiceServer
 // for forward compatibility.
 type TransferServiceServer interface {
-	CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error)
-	GetTransfer(context.Context, *GetTransferRequest) (*TransferRecord, error)
+	DoTransfer(context.Context, *DoTransferRequest) (*DoTransferResponse, error)
+	GetHistory(context.Context, *GetHistoryRequest) (*GetHistoryResponse, error)
 	mustEmbedUnimplementedTransferServiceServer()
 }
 
@@ -75,11 +75,11 @@ type TransferServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTransferServiceServer struct{}
 
-func (UnimplementedTransferServiceServer) CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateTransfer not implemented")
+func (UnimplementedTransferServiceServer) DoTransfer(context.Context, *DoTransferRequest) (*DoTransferResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DoTransfer not implemented")
 }
-func (UnimplementedTransferServiceServer) GetTransfer(context.Context, *GetTransferRequest) (*TransferRecord, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetTransfer not implemented")
+func (UnimplementedTransferServiceServer) GetHistory(context.Context, *GetHistoryRequest) (*GetHistoryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetHistory not implemented")
 }
 func (UnimplementedTransferServiceServer) mustEmbedUnimplementedTransferServiceServer() {}
 func (UnimplementedTransferServiceServer) testEmbeddedByValue()                         {}
@@ -102,38 +102,38 @@ func RegisterTransferServiceServer(s grpc.ServiceRegistrar, srv TransferServiceS
 	s.RegisterService(&TransferService_ServiceDesc, srv)
 }
 
-func _TransferService_CreateTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateTransferRequest)
+func _TransferService_DoTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DoTransferRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TransferServiceServer).CreateTransfer(ctx, in)
+		return srv.(TransferServiceServer).DoTransfer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TransferService_CreateTransfer_FullMethodName,
+		FullMethod: TransferService_DoTransfer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TransferServiceServer).CreateTransfer(ctx, req.(*CreateTransferRequest))
+		return srv.(TransferServiceServer).DoTransfer(ctx, req.(*DoTransferRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TransferService_GetTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTransferRequest)
+func _TransferService_GetHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHistoryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TransferServiceServer).GetTransfer(ctx, in)
+		return srv.(TransferServiceServer).GetHistory(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TransferService_GetTransfer_FullMethodName,
+		FullMethod: TransferService_GetHistory_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TransferServiceServer).GetTransfer(ctx, req.(*GetTransferRequest))
+		return srv.(TransferServiceServer).GetHistory(ctx, req.(*GetHistoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -142,16 +142,16 @@ func _TransferService_GetTransfer_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TransferService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "wholesales.transfer.TransferService",
+	ServiceName: "transfer.TransferService",
 	HandlerType: (*TransferServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateTransfer",
-			Handler:    _TransferService_CreateTransfer_Handler,
+			MethodName: "DoTransfer",
+			Handler:    _TransferService_DoTransfer_Handler,
 		},
 		{
-			MethodName: "GetTransfer",
-			Handler:    _TransferService_GetTransfer_Handler,
+			MethodName: "GetHistory",
+			Handler:    _TransferService_GetHistory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
