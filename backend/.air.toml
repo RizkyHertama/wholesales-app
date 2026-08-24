@@ -1,0 +1,26 @@
+root = "."
+tmp_dir = "backend/tmp"
+
+[build]
+  cmd = "go build -ldflags=\"-s -w\" -o ./backend/tmp/main.exe ./server/main.go"
+  bin = "backend/tmp/main.exe"
+  full_bin = ".\\backend\\tmp\\main.exe"
+  
+  include_ext = ["go"]
+  
+  exclude_dir = [
+    "frontend",
+    "backend/tmp",
+    "backend/pb",
+    "backend/migrations",
+    "backend/proto",
+    ".git"
+  ]
+  exclude_regex = ["_test\\.go", ".*_pb\\.go"]
+  
+  # Turunkan delay agar trigger build langsung berjalan dalam hitungan milidetik
+  delay = 300 
+  stop_on_error = true
+
+[misc]
+  clean_on_exit = true
