@@ -2,6 +2,7 @@ package apihandler
 
 import (
 	"net/http"
+	"strings"
 
 	"wholesales-app/backend/server/common"
 	"wholesales-app/backend/server/pb"
@@ -28,7 +29,19 @@ func (h *AuthRESTHandler) Login(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		common.Error(c, http.StatusBadRequest, "Request tidak valid")
+		return
+	}
+
+	// Validasi email dan password wajib diisi
+	if req.Email == "" || req.Password == "" {
 		common.Error(c, http.StatusBadRequest, "Email dan password wajib diisi")
+		return
+	}
+
+	// Validasi format email
+	if !strings.Contains(req.Email, "@") {
+		common.Error(c, http.StatusBadRequest, "Email tidak valid")
 		return
 	}
 

@@ -15,6 +15,8 @@ var transferFees = map[string]float64{
 	"SKN":     2900,
 }
 
+var toCompanyID *int64
+
 // Input untuk melakukan transfer
 type TransferInput struct {
 	FromCompanyID   int64
@@ -56,18 +58,18 @@ func NewTransferService(
 
 // Proses transfer
 func (s *transferService) DoTransfer(ctx context.Context, input TransferInput) (*TransferResult, error) {
-	// 1. Validasi minimal transfer
+	// Validasi minimal transfer
 	if input.Amount < 10000 {
 		return nil, errors.New("minimal transfer adalah Rp 10.000")
 	}
 
-	// 2. Ambil data perusahaan pengirim
+	// Ambil data perusahaan pengirim
 	fromCompany, err := s.companyRepo.GetByID(ctx, input.FromCompanyID)
 	if err != nil {
 		return nil, errors.New("perusahaan pengirim tidak ditemukan")
 	}
 
-	// 3. Hitung biaya transfer
+	// Hitung biaya transfer
 	// Transfer INTERNAL (sesama BRI) gratis, EXTERNAL kena biaya
 	fee := 0.0
 	if input.TransferType == "EXTERNAL" {
@@ -75,7 +77,16 @@ func (s *transferService) DoTransfer(ctx context.Context, input TransferInput) (
 	}
 	totalDeduct := input.Amount + fee
 
-	// 4. Validasi saldo mencukupi
+	// Cari to_company_id hanya kalau transfer INTERNAL
+	if input.TransferType == "INTERNAL" {
+		company, err := s.companyRepo.GetByAccountNumber(ctx, input.ToAccountNumber)
+		if err != nil {
+			return nil, fmt.Errorf("rekening tujuan tidak ditemukan di sistem kami")
+		}
+		toCompanyID = &company.ID
+	}
+
+	// Validasi saldo mencukupi
 	if fromCompany.Balance < totalDeduct {
 		return nil, fmt.Errorf(
 			"saldo tidak mencukupi. Saldo: Rp %.0f, Dibutuhkan: Rp %.0f (termasuk biaya Rp %.0f)",
@@ -83,7 +94,12 @@ func (s *transferService) DoTransfer(ctx context.Context, input TransferInput) (
 		)
 	}
 
-	// 5. Simpan record transfer ke database
+	// Validasi jika transfer type INTERNAL, Bank name harus "BRI"
+	if input.TransferType == "INTERNAL" && input.ToBankName != "BRI" {
+		return nil, errors.New("transfer INTERNAL hanya bisa ke bank BRI")
+	}
+
+	// Simpan record transfer ke database
 	transfer := &repository.Transfer{
 		FromCompanyID:   input.FromCompanyID,
 		ToAccountNumber: input.ToAccountNumber,

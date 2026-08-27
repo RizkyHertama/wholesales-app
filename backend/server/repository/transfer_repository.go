@@ -10,7 +10,7 @@ import (
 type Transfer struct {
 	ID              int64   `db:"id"`
 	FromCompanyID   int64   `db:"from_company_id"`
-	ToCompanyID     int64   `db:"to_company_id"`
+	ToCompanyID     *int64  `db:"to_company_id"` // pakai pointer, bisa nil
 	ToAccountNumber string  `db:"to_account_number"`
 	ToBankName      string  `db:"to_bank_name"`
 	Amount          float64 `db:"amount"`

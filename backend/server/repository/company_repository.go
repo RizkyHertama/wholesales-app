@@ -24,6 +24,7 @@ type CompanyRepository interface {
 	GetAll(ctx context.Context, page, limit int) ([]Company, int, error)
 	GetByID(ctx context.Context, id int64) (*Company, error)
 	UpdateBalance(ctx context.Context, id int64, newBalance float64) error
+	GetByAccountNumber(ctx context.Context, accountNumber string) (*Company, error)
 }
 
 type companyRepo struct {
@@ -90,4 +91,16 @@ func (r *companyRepo) UpdateBalance(ctx context.Context, id int64, newBalance fl
 		newBalance, id,
 	)
 	return err
+}
+
+func (r *companyRepo) GetByAccountNumber(ctx context.Context, accountNumber string) (*Company, error) {
+	var company Company
+	err := r.db.GetContext(ctx, &company,
+		"SELECT id, name, email, phone, balance, account_number FROM companies WHERE account_number = $1",
+		accountNumber,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &company, nil
 }
