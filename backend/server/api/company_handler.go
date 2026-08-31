@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"wholesales-app/backend/server/common"
+	"wholesales-app/backend/server/middleware"
 	"wholesales-app/backend/server/pb"
 
 	"github.com/gin-gonic/gin"
@@ -44,11 +45,11 @@ func (h *CompanyRESTHandler) GetCompanyList(c *gin.Context) {
 	})
 }
 
-// GET /api/company/balance?company_id=1
+// GET /api/company/balance
 func (h *CompanyRESTHandler) GetBalance(c *gin.Context) {
-	companyID, err := strconv.ParseInt(c.Query("company_id"), 10, 64)
-	if err != nil {
-		common.Error(c, http.StatusBadRequest, "company_id tidak valid")
+	companyID, ok := middleware.GetCompanyID(c)
+	if !ok {
+		common.Error(c, http.StatusUnauthorized, "Token tidak valid")
 		return
 	}
 
@@ -69,10 +70,15 @@ func (h *CompanyRESTHandler) GetBalance(c *gin.Context) {
 
 // POST /api/company/topup
 func (h *CompanyRESTHandler) TopUp(c *gin.Context) {
+	companyID, ok := middleware.GetCompanyID(c)
+	if !ok {
+		common.Error(c, http.StatusUnauthorized, "Token tidak valid")
+		return
+	}
+
 	var req struct {
-		CompanyID int64   `json:"company_id" binding:"required"`
-		Amount    float64 `json:"amount" binding:"required,min=10000"`
-		Note      string  `json:"note"`
+		Amount float64 `json:"amount" binding:"required,min=10000"`
+		Note   string  `json:"note"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -81,7 +87,7 @@ func (h *CompanyRESTHandler) TopUp(c *gin.Context) {
 	}
 
 	result, err := h.grpcClient.TopUp(c.Request.Context(), &pb.TopUpRequest{
-		CompanyId: req.CompanyID,
+		CompanyId: companyID,
 		Amount:    req.Amount,
 		Note:      req.Note,
 	})

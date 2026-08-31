@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -38,6 +39,10 @@ func (r *authRepo) FindByEmail(ctx context.Context, email string) (*CompanyAuth,
 	query := `SELECT id, name, email, password_hash, account_number FROM companies WHERE email = $1`
 
 	err := r.db.GetContext(ctx, &company, query, email)
+
+	log.Printf("Company", company)
+	log.Printf("Query", query)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errors.New("email tidak ditemukan")

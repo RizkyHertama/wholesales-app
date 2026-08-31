@@ -9,6 +9,7 @@ import (
 	apihandler "wholesales-app/backend/server/api"
 	"wholesales-app/backend/server/config"
 	grpchandler "wholesales-app/backend/server/grpc"
+	"wholesales-app/backend/server/middleware"
 	"wholesales-app/backend/server/pb"
 	"wholesales-app/backend/server/repository"
 	"wholesales-app/backend/server/service"
@@ -96,8 +97,9 @@ func main() {
 	r.POST("/api/auth/login", authREST.Login)
 	r.POST("/api/auth/register", authREST.Register)
 
-	// Protected — perlu token JWT (middleware menyusul)
+	// Protected — perlu token JWT
 	api := r.Group("/api")
+	api.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 	{
 		// Saldo & Top Up
 		api.GET("/company/balance", companyREST.GetBalance)

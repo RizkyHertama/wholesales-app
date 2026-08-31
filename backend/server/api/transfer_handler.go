@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"wholesales-app/backend/server/common"
+	"wholesales-app/backend/server/middleware"
 	"wholesales-app/backend/server/pb"
 
 	"github.com/gin-gonic/gin"
@@ -23,8 +24,13 @@ func NewTransferRESTHandler(conn *grpc.ClientConn) *TransferRESTHandler {
 
 // POST /api/transfer
 func (h *TransferRESTHandler) DoTransfer(c *gin.Context) {
+	companyID, ok := middleware.GetCompanyID(c)
+	if !ok {
+		common.Error(c, http.StatusUnauthorized, "Token tidak valid")
+		return
+	}
+
 	var req struct {
-		FromCompanyID   int64   `json:"from_company_id" binding:"required"`
 		ToAccountNumber string  `json:"to_account_number" binding:"required"`
 		ToBankName      string  `json:"to_bank_name"`
 		Amount          float64 `json:"amount" binding:"required,min=10000"`
@@ -53,7 +59,7 @@ func (h *TransferRESTHandler) DoTransfer(c *gin.Context) {
 	}
 
 	result, err := h.grpcClient.DoTransfer(c.Request.Context(), &pb.DoTransferRequest{
-		FromCompanyId:   req.FromCompanyID,
+		FromCompanyId:   companyID,
 		ToAccountNumber: req.ToAccountNumber,
 		ToBankName:      req.ToBankName,
 		Amount:          req.Amount,
@@ -77,11 +83,11 @@ func (h *TransferRESTHandler) DoTransfer(c *gin.Context) {
 	})
 }
 
-// GET /api/transfer/history?company_id=1&page=1&limit=10
+// GET /api/transfer/history?page=1&limit=10
 func (h *TransferRESTHandler) GetHistory(c *gin.Context) {
-	companyID, err := strconv.ParseInt(c.Query("company_id"), 10, 64)
-	if err != nil {
-		common.Error(c, http.StatusBadRequest, "company_id tidak valid")
+	companyID, ok := middleware.GetCompanyID(c)
+	if !ok {
+		common.Error(c, http.StatusUnauthorized, "Token tidak valid")
 		return
 	}
 
