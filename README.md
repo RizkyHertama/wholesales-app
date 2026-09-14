@@ -1,4 +1,6 @@
 Bisa. Dari struktur folder yang terlihat di screenshot, arsitekturnya kira-kira seperti ini:
+ini test iky
+ini test digital
 
 ```text
 backend/
